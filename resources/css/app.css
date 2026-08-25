@@ -1,0 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../views/**/*.blade.php';
+
+@theme {
+    --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+    --color-maroon-50: #fff1f2;
+    --color-maroon-100: #ffe4e6;
+    --color-maroon-200: #fecdd3;
+    --color-maroon-300: #fda4af;
+    --color-maroon-400: #fb7185;
+    --color-maroon-500: #f43f5e;
+    --color-maroon-600: #e11d48;
+    --color-maroon-700: #be123c;
+    --color-maroon-800: #9f1239;
+    --color-maroon-900: #7f1d2d;
+    --color-maroon-950: #4c0519;
+}
+
+body {
+    font-family: var(--font-sans);
+    color: #1e293b;
+    background-color: #f8fafc;
+    -webkit-font-smoothing: antialiased;
+}
+
+.font-mono-code {
+    font-family: var(--font-mono);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Print Styling */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        font-size: 11pt;
+    }
+    .print-only {
+        display: block !important;
+    }
+    @page {
+        size: A4 landscape;
+        margin: 1.2cm 1.5cm;
+    }
+}
