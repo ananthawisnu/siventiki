@@ -59,9 +59,11 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? [
-                Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT => false,
-            ] : [],
+            'options' => [
+                // Memaksa PDO mengaktifkan SSL dengan parameter driver khusus MySQL
+                PDO::MYSQL_ATTR_SSL_CA => true,
+                PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
+            ],
         ],
 
         'mariadb' => [
