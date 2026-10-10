@@ -22,7 +22,7 @@ class ItemController extends Controller
 
         $query = Item::with(['batches'])
             ->when($selectedWarehouse !== 'all', fn ($q) => $q->where('warehouse', $selectedWarehouse))
-            ->when($category !== 'all' && in_array($category, ['obat', 'bhp']), fn ($q) => $q->where('category', $category))
+            ->when($category !== 'all' && in_array($category, ['obat', 'bhp', 'bhp_non_medis', 'inventaris']), fn ($q) => $q->where('category', $category))
             ->when($search, function ($q, $search) {
                 $q->where(function ($sub) use ($search) {
                     $sub->where('name', 'LIKE', "%{$search}%")
@@ -49,7 +49,7 @@ class ItemController extends Controller
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'category' => ['required', Rule::in(['obat', 'bhp'])],
+            'category' => ['required', Rule::in(['obat', 'bhp', 'bhp_non_medis'])],
             'warehouse' => [
                 'required',
                 Rule::in(['ksr', 'poliklinik']),
@@ -60,11 +60,11 @@ class ItemController extends Controller
                 },
             ],
             'unit' => ['required', 'string', 'max:50'],
-            'min_stock' => [$request->category === 'bhp' ? 'required' : 'nullable', 'integer', 'min:0'],
+            'min_stock' => [in_array($request->category, ['bhp', 'bhp_non_medis']) ? 'required' : 'nullable', 'integer', 'min:0'],
             'description' => ['nullable', 'string', 'max:1000'],
         ], [
             'name.required' => 'Nama barang wajib diisi.',
-            'category.required' => 'Kategori (Obat / BHP) wajib dipilih.',
+            'category.required' => 'Kategori (Obat / BHP Medis / BHP Non Medis) wajib dipilih.',
             'unit.required' => 'Satuan barang wajib diisi.',
             'min_stock.required' => 'Batas minimum stok wajib diisi untuk kategori BHP Medis.',
         ]);
@@ -103,7 +103,7 @@ class ItemController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'unit' => ['required', 'string', 'max:50'],
-            'min_stock' => [$item->category === 'bhp' ? 'required' : 'nullable', 'integer', 'min:0'],
+            'min_stock' => [in_array($item->category, ['bhp', 'bhp_non_medis']) ? 'required' : 'nullable', 'integer', 'min:0'],
             'description' => ['nullable', 'string', 'max:1000'],
         ], [
             'name.required' => 'Nama barang wajib diisi.',

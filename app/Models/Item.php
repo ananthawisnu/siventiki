@@ -58,7 +58,7 @@ class Item extends Model
 
     public function getIsLowStockAttribute(): bool
     {
-        if ($this->category === 'bhp' && $this->min_stock > 0) {
+        if (in_array($this->category, ['bhp', 'bhp_non_medis']) && $this->min_stock > 0) {
             return $this->current_stock <= $this->min_stock;
         }
 
@@ -70,6 +70,7 @@ class Item extends Model
         return match ($this->category) {
             'obat' => 'Obat Medis',
             'bhp' => 'BHP Medis',
+            'bhp_non_medis' => 'BHP Non Medis',
             default => strtoupper($this->category),
         };
     }
@@ -77,8 +78,8 @@ class Item extends Model
     public function getWarehouseLabelAttribute(): string
     {
         return match ($this->warehouse) {
-            'ksr' => 'Gudang KSR',
-            'poliklinik' => 'Poliklinik',
+            'ksr' => 'Gudang Obat',
+            'poliklinik' => 'Gudang Inventaris',
             default => ucfirst($this->warehouse),
         };
     }

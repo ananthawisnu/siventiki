@@ -80,8 +80,8 @@ class User extends Authenticatable
     {
         return match ($this->role) {
             'super_admin' => 'Super Admin',
-            'admin_ksr' => 'Admin KSR',
-            'admin_poliklinik' => 'Admin Poliklinik',
+            'admin_ksr' => 'Admin Gudang Obat',
+            'admin_poliklinik' => 'Admin Gudang Inventaris',
             default => ucfirst($this->role),
         };
     }
@@ -90,8 +90,8 @@ class User extends Authenticatable
     {
         return match ($this->warehouse) {
             'all' => 'Semua Gudang',
-            'ksr' => 'Gudang KSR',
-            'poliklinik' => 'Gudang Poliklinik',
+            'ksr' => 'Gudang Obat',
+            'poliklinik' => 'Gudang Inventaris',
             default => ucfirst($this->warehouse),
         };
     }

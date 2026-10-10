@@ -19,9 +19,9 @@
         <div>
             <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
                 <svg class="w-6 h-6 text-[#7f1d2d]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                <span>Manajemen Akun & Role Pengguna</span>
+                <span>Manajemen Akun Pengguna</span>
             </h2>
-            <p class="text-xs text-slate-500 mt-1">Username berbasis NIM mahasiswa dengan 3 Role: Super Admin, Admin KSR, & Admin Poliklinik</p>
+            <p class="text-xs text-slate-500 mt-1">Username berbasis NIM mahasiswa dengan 3 Role: Super Admin, Admin Gudang Obat, & Admin Gudang Inventaris</p>
         </div>
 
         <div class="flex items-center gap-3">
@@ -105,10 +105,10 @@
                                 </form>
 
                                 <!-- Delete -->
-                                <form method="POST" action="{{ route('users.destroy', $u) }}" onsubmit="return confirm('Hapus akun pengguna ini?');">
+                                <form method="POST" action="{{ route('users.destroy', $u) }}" data-swal-confirm="Hapus akun pengguna '{{ $u->name }}' (NIM: {{ $u->nim }})?" data-swal-title="Hapus Akun" data-swal-icon="warning" data-swal-ok="Ya, Hapus">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="p-1.5 rounded-xl text-rose-600 hover:text-rose-900 hover:bg-rose-50" title="Hapus">
+                                    <button type="submit" class="p-1.5 rounded-xl text-rose-600 hover:text-rose-900 hover:bg-rose-50" title="Hapus Akun">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                     </button>
                                 </form>
@@ -161,8 +161,8 @@
                         Role Akses <span class="text-rose-600">*</span>
                     </label>
                     <select id="create_user_role" name="role" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-rose-700 outline-none">
-                        <option value="admin_ksr">Admin KSR (Hanya data Gudang KSR)</option>
-                        <option value="admin_poliklinik">Admin Poliklinik (Hanya data Poliklinik)</option>
+                        <option value="admin_ksr">Admin Gudang Obat (Hanya data Gudang Obat)</option>
+                        <option value="admin_poliklinik">Admin Gudang Inventaris (Hanya data Gudang Inventaris)</option>
                         <option value="super_admin">Super Admin (Akses Penuh Semua Gudang)</option>
                     </select>
                 </div>
@@ -224,8 +224,8 @@
                 <div>
                     <label for="edit_user_role" class="block text-xs font-bold text-slate-700 uppercase mb-1">Role Akses</label>
                     <select id="edit_user_role" name="role" x-model="selectedUser.role" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-rose-700 outline-none">
-                        <option value="admin_ksr">Admin KSR</option>
-                        <option value="admin_poliklinik">Admin Poliklinik</option>
+                        <option value="admin_ksr">Admin Gudang Obat</option>
+                        <option value="admin_poliklinik">Admin Gudang Inventaris</option>
                         <option value="super_admin">Super Admin</option>
                     </select>
                 </div>

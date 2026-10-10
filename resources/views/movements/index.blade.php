@@ -263,6 +263,7 @@
                     <p class="col-span-2 text-[10px] text-slate-500">
                         <span x-show="inboundSelectedCategory === 'obat'" class="text-rose-700 font-bold">* Kategori Obat wajib mengisi Batch No & Tanggal Kedaluwarsa untuk algoritma FEFO.</span>
                         <span x-show="inboundSelectedCategory === 'bhp'">* BHP Medis: Batch & Expiry opsional.</span>
+                        <span x-show="inboundSelectedCategory === 'bhp_non_medis'">* BHP Non Medis: Batch & Expiry tidak diperlukan (habis pakai umum).</span>
                     </p>
                 </div>
 

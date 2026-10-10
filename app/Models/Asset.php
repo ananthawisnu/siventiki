@@ -67,8 +67,8 @@ class Asset extends Model
     public function getWarehouseLabelAttribute(): string
     {
         return match ($this->warehouse) {
-            'ksr' => 'Gudang KSR',
-            'poliklinik' => 'Poliklinik',
+            'ksr' => 'Gudang Obat',
+            'poliklinik' => 'Gudang Inventaris',
             default => ucfirst($this->warehouse),
         };
     }

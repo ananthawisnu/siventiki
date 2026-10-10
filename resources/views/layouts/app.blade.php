@@ -14,6 +14,10 @@
 
     <!-- Alpine.js for lightweight reactivity -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body class="h-full flex flex-col font-sans antialiased text-slate-800 selection:bg-rose-500 selection:text-white" x-data="{ sidebarOpen: false, userMenuOpen: false }">
 
@@ -192,9 +196,9 @@
                         <a href="{{ request()->fullUrlWithQuery(['warehouse' => 'all']) }}" 
                            class="px-2.5 py-1 rounded-lg font-medium transition-colors {{ request('warehouse', 'all') === 'all' ? 'bg-[#7f1d2d] text-white shadow-xs' : 'text-slate-700 hover:text-slate-900' }}">Semua</a>
                         <a href="{{ request()->fullUrlWithQuery(['warehouse' => 'ksr']) }}" 
-                           class="px-2.5 py-1 rounded-lg font-medium transition-colors {{ request('warehouse') === 'ksr' ? 'bg-[#7f1d2d] text-white shadow-xs' : 'text-slate-700 hover:text-slate-900' }}">KSR</a>
+                           class="px-2.5 py-1 rounded-lg font-medium transition-colors {{ request('warehouse') === 'ksr' ? 'bg-[#7f1d2d] text-white shadow-xs' : 'text-slate-700 hover:text-slate-900' }}">Gudang Obat</a>
                         <a href="{{ request()->fullUrlWithQuery(['warehouse' => 'poliklinik']) }}" 
-                           class="px-2.5 py-1 rounded-lg font-medium transition-colors {{ request('warehouse') === 'poliklinik' ? 'bg-[#7f1d2d] text-white shadow-xs' : 'text-slate-700 hover:text-slate-900' }}">Poliklinik</a>
+                           class="px-2.5 py-1 rounded-lg font-medium transition-colors {{ request('warehouse') === 'poliklinik' ? 'bg-[#7f1d2d] text-white shadow-xs' : 'text-slate-700 hover:text-slate-900' }}">Gudang Inventaris</a>
                     </div>
                     @endif
 
@@ -245,55 +249,16 @@
                 </div>
             </header>
 
-            <!-- TOAST FEEDBACK ALERTS -->
-            <div class="px-4 lg:px-8 pt-4 no-print">
+            <!-- FLASH MESSAGES via SweetAlert2 Toast -->
+            <div style="display:none;">
                 @if(session('success'))
-                <div class="flex items-center justify-between p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 shadow-xs mb-3 animate-fade-in">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        </div>
-                        <p class="text-sm font-medium">{{ session('success') }}</p>
-                    </div>
-                    <button type="button" @click="$el.parentElement.remove()" class="text-emerald-600 hover:text-emerald-900 p-1">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
-                </div>
+                <span id="flash-success">{{ session('success') }}</span>
                 @endif
-
                 @if(session('info'))
-                <div class="flex items-center justify-between p-4 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 shadow-xs mb-3">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </div>
-                        <p class="text-sm font-medium">{{ session('info') }}</p>
-                    </div>
-                    <button type="button" @click="$el.parentElement.remove()" class="text-blue-600 hover:text-blue-900 p-1">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
-                </div>
+                <span id="flash-info">{{ session('info') }}</span>
                 @endif
-
                 @if($errors->any())
-                <div class="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 shadow-xs mb-3">
-                    <div class="flex items-start gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-[#7f1d2d] text-white flex items-center justify-center shrink-0 mt-0.5">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </div>
-                        <div class="flex-1">
-                            <h4 class="font-bold text-sm text-rose-950">Terjadi Kesalahan:</h4>
-                            <ul class="mt-1 list-disc list-inside text-xs space-y-0.5 text-rose-800">
-                                @foreach($errors->all() as $err)
-                                <li>{{ $err }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                        <button type="button" @click="$el.parentElement.parentElement.remove()" class="text-rose-600 hover:text-rose-900 p-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                        </button>
-                    </div>
-                </div>
+                <span id="flash-errors">{{ implode('||', $errors->all()) }}</span>
                 @endif
             </div>
 
@@ -312,5 +277,88 @@
     </div>
 
     @stack('scripts')
+
+    <script>
+    // ── SweetAlert2 Global Config ──────────────────────────────────────────────
+    const SwalToast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 4000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer);
+            toast.addEventListener('mouseleave', Swal.resumeTimer);
+        }
+    });
+
+    // ── Flash Messages ─────────────────────────────────────────────────────────
+    const flashSuccess = document.getElementById('flash-success');
+    const flashInfo    = document.getElementById('flash-info');
+    const flashErrors  = document.getElementById('flash-errors');
+
+    if (flashSuccess) {
+        SwalToast.fire({
+            icon: 'success',
+            title: flashSuccess.textContent.trim(),
+            background: '#f0fdf4',
+            color: '#14532d',
+            iconColor: '#16a34a',
+        });
+    }
+
+    if (flashInfo) {
+        SwalToast.fire({
+            icon: 'info',
+            title: flashInfo.textContent.trim(),
+            background: '#eff6ff',
+            color: '#1e3a5f',
+            iconColor: '#2563eb',
+        });
+    }
+
+    if (flashErrors) {
+        const msgs = flashErrors.textContent.trim().split('||');
+        const listHtml = '<ul style="text-align:left;margin-top:6px;padding-left:18px;font-size:13px">' +
+            msgs.map(m => `<li>${m}</li>`).join('') + '</ul>';
+        Swal.fire({
+            icon: 'error',
+            title: 'Terjadi Kesalahan',
+            html: listHtml,
+            confirmButtonColor: '#7f1d2d',
+            confirmButtonText: 'Mengerti',
+            background: '#fff1f2',
+            color: '#7f1d1d',
+        });
+    }
+
+    // ── Konfirmasi Delete / Aksi Berbahaya ─────────────────────────────────────
+    // Tambahkan atribut data-swal-confirm="Pesan konfirmasi" pada form untuk mengaktifkan.
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('form[data-swal-confirm]').forEach(form => {
+            form.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const msg   = this.dataset.swalConfirm  || 'Apakah Anda yakin?';
+                const title = this.dataset.swalTitle    || 'Konfirmasi Aksi';
+                const icon  = this.dataset.swalIcon     || 'warning';
+                const confirmText = this.dataset.swalOk || 'Ya, Lanjutkan';
+                const result = await Swal.fire({
+                    title,
+                    text: msg,
+                    icon,
+                    showCancelButton: true,
+                    confirmButtonColor: '#7f1d2d',
+                    cancelButtonColor:  '#64748b',
+                    confirmButtonText:  confirmText,
+                    cancelButtonText:   'Batal',
+                    reverseButtons: true,
+                });
+                if (result.isConfirmed) {
+                    this.submit();
+                }
+            });
+        });
+    });
+    </script>
 </body>
 </html>

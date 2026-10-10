@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Katalog Obat & BHP')
-@section('header_title', 'Master Data Obat & Bahan Habis Pakai (BHP)')
+@section('title', 'Katalog Obat, BHP & Inventaris')
+@section('header_title', 'Master Data Obat, BHP Medis & Non Medis')
 
 @section('content')
 <div class="space-y-6" x-data="{ 
@@ -36,7 +36,7 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         
         <!-- Category Tabs -->
-        <div class="flex items-center gap-1.5 bg-white p-1.5 rounded-2xl border border-slate-200/80 shadow-xs text-xs font-semibold">
+        <div class="flex items-center gap-1.5 bg-white p-1.5 rounded-2xl border border-slate-200/80 shadow-xs text-xs font-semibold flex-wrap">
             <a href="{{ request()->fullUrlWithQuery(['category' => 'all']) }}" 
                class="px-4 py-2 rounded-xl transition-colors {{ request('category', 'all') === 'all' ? 'bg-[#7f1d2d] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900' }}">
                 Semua Kategori
@@ -48,6 +48,10 @@
             <a href="{{ request()->fullUrlWithQuery(['category' => 'bhp']) }}" 
                class="px-4 py-2 rounded-xl transition-colors {{ request('category') === 'bhp' ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900' }}">
                 BHP Medis
+            </a>
+            <a href="{{ request()->fullUrlWithQuery(['category' => 'bhp_non_medis']) }}" 
+               class="px-4 py-2 rounded-xl transition-colors {{ request('category', 'bhp_non_medis') === 'bhp_non_medis' ? 'bg-indigo-700 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900' }}">
+                BHP Non Medis
             </a>
         </div>
 
@@ -120,10 +124,19 @@
                                 <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
                                 Obat Medis
                             </span>
-                            @else
+                            @elseif($item->category === 'bhp')
                             <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px] border border-emerald-300 inline-flex items-center gap-1">
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
                                 BHP Medis
+                            </span>
+                            @elseif($item->category === 'bhp_non_medis')
+                            <span class="px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-800 font-bold text-[10px] border border-indigo-300 inline-flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>
+                                BHP Non Medis
+                            </span>
+                            @else
+                            <span class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 font-bold text-[10px] border border-slate-300 inline-flex items-center gap-1">
+                                {{ $item->category_label }}
                             </span>
                             @endif
                         </td>
@@ -135,12 +148,12 @@
                             </span>
                         </td>
 
-                        <!-- Min Stock (for BHP) -->
+                        <!-- Min Stock (for BHP & BHP Non Medis only) -->
                         <td class="py-4 px-4 text-center font-mono">
-                            @if($item->category === 'bhp')
+                            @if(in_array($item->category, ['bhp', 'bhp_non_medis']))
                             <span class="text-slate-600 font-semibold">{{ $item->min_stock }}</span> <span class="text-slate-400 text-[10px]">{{ $item->unit }}</span>
                             @else
-                            <span class="text-slate-300">-</span>
+                            <span class="text-slate-300">—</span>
                             @endif
                         </td>
 
@@ -183,7 +196,7 @@
                                 </button>
 
                                 <!-- Delete -->
-                                <form method="POST" action="{{ route('items.destroy', $item) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus barang ini?');">
+                                <form method="POST" action="{{ route('items.destroy', $item) }}" data-swal-confirm="Apakah Anda yakin ingin menghapus barang '{{ $item->name }}'? Pastikan stok aktif bernilai 0." data-swal-title="Hapus Barang" data-swal-icon="warning" data-swal-ok="Ya, Hapus">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" 
@@ -240,6 +253,7 @@
                         <select id="create_category" name="category" x-model="cat" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-rose-700 outline-none">
                             <option value="obat">Obat Medis</option>
                             <option value="bhp">BHP Medis</option>
+                            <option value="bhp_non_medis">BHP Non Medis</option>
                         </select>
                     </div>
 
@@ -249,10 +263,10 @@
                         </label>
                         <select id="create_warehouse" name="warehouse" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-rose-700 outline-none">
                             @if(auth()->user()->isSuperAdmin() || auth()->user()->warehouse === 'ksr')
-                            <option value="ksr">Gudang KSR</option>
+                            <option value="ksr">Gudang Obat</option>
                             @endif
                             @if(auth()->user()->isSuperAdmin() || auth()->user()->warehouse === 'poliklinik')
-                            <option value="poliklinik">Gudang Poliklinik</option>
+                            <option value="poliklinik">Gudang Inventaris</option>
                             @endif
                         </select>
                     </div>
@@ -269,9 +283,9 @@
 
                     <div>
                         <label for="create_min_stock" class="block text-xs font-bold text-slate-700 uppercase mb-1">
-                            Batas Min. Stok <span x-show="cat === 'bhp'" class="text-rose-600">*</span>
+                            Batas Min. Stok <span x-show="cat === 'bhp' || cat === 'bhp_non_medis'" class="text-rose-600">*</span>
                         </label>
-                        <input type="number" id="create_min_stock" name="min_stock" min="0" value="10" :required="cat === 'bhp'" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-rose-700 outline-none font-mono">
+                        <input type="number" id="create_min_stock" name="min_stock" min="0" value="10" :required="cat === 'bhp' || cat === 'bhp_non_medis'" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-rose-700 outline-none font-mono">
                     </div>
                 </div>
 

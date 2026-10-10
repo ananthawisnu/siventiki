@@ -301,7 +301,7 @@ class InventoryService
                 'kind' => 'outbound',
                 'quantity' => $quantity,
                 'reference_no' => $transferNo,
-                'source_destination' => 'Mutasi ke '.($targetWarehouse === 'poliklinik' ? 'Poliklinik' : 'Gudang KSR'),
+                'source_destination' => 'Mutasi ke '.($targetWarehouse === 'poliklinik' ? 'Gudang Inventaris' : 'Gudang Obat'),
                 'actor_id' => $requester->id,
                 'actor_name' => $requester->name,
                 'notes' => "Transfer antar gudang #{$transferNo}: {$notes}",
@@ -352,7 +352,7 @@ class InventoryService
                     'initial_quantity' => $alloc['quantity'],
                     'received_at' => now(),
                     'invoice_no' => $transfer->transfer_no,
-                    'source' => 'Mutasi dari '.($transfer->source_warehouse === 'poliklinik' ? 'Poliklinik' : 'Gudang KSR'),
+                    'source' => 'Mutasi dari '.($transfer->source_warehouse === 'poliklinik' ? 'Gudang Inventaris' : 'Gudang Obat'),
                 ]);
 
                 $targetAllocations[] = [
@@ -378,7 +378,7 @@ class InventoryService
                 'kind' => 'inbound',
                 'quantity' => $transfer->quantity,
                 'reference_no' => $transfer->transfer_no,
-                'source_destination' => 'Mutasi Masuk dari '.($transfer->source_warehouse === 'poliklinik' ? 'Poliklinik' : 'Gudang KSR'),
+                'source_destination' => 'Mutasi Masuk dari '.($transfer->source_warehouse === 'poliklinik' ? 'Gudang Inventaris' : 'Gudang Obat'),
                 'actor_id' => $receiver->id,
                 'actor_name' => $receiver->name,
                 'notes' => "Penerimaan mutasi #{$transfer->transfer_no}",

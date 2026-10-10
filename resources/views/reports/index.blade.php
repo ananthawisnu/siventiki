@@ -53,9 +53,9 @@
                 <label for="rep_warehouse" class="block text-xs font-bold text-slate-700 uppercase mb-1.5">Lingkup Gudang</label>
                 <select id="rep_warehouse" name="warehouse" {{ !auth()->user()->isSuperAdmin() ? 'disabled' : '' }} class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-700 outline-none">
                     @if(auth()->user()->isSuperAdmin())
-                    <option value="all" {{ $selectedWarehouse === 'all' ? 'selected' : '' }}>Semua Gudang (KSR + Poliklinik)</option>
-                    <option value="ksr" {{ $selectedWarehouse === 'ksr' ? 'selected' : '' }}>Gudang KSR</option>
-                    <option value="poliklinik" {{ $selectedWarehouse === 'poliklinik' ? 'selected' : '' }}>Gudang Poliklinik</option>
+                    <option value="all" {{ $selectedWarehouse === 'all' ? 'selected' : '' }}>Semua Gudang (Gudang Obat + Gudang Inventaris)</option>
+                    <option value="ksr" {{ $selectedWarehouse === 'ksr' ? 'selected' : '' }}>Gudang Obat</option>
+                    <option value="poliklinik" {{ $selectedWarehouse === 'poliklinik' ? 'selected' : '' }}>Gudang Inventaris</option>
                     @else
                     <option value="{{ auth()->user()->warehouse }}">{{ auth()->user()->warehouse_label }}</option>
                     @endif

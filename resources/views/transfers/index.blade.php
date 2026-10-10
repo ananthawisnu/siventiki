@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Mutasi Antar Gudang')
-@section('header_title', 'Mutasi Logistik Antar Gudang (KSR ↔ Poliklinik)')
+@section('header_title', 'Mutasi Logistik Antar Gudang (Gudang Obat ↔ Gudang Inventaris)')
 
 @section('content')
 <div class="space-y-6" x-data="{ 
@@ -24,7 +24,7 @@
         <div>
             <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
                 <svg class="w-6 h-6 text-[#7f1d2d]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
-                <span>Mutasi Antar Gudang (KSR ↔ Poliklinik)</span>
+                <span>Mutasi Antar Gudang (Gudang Obat ↔ Gudang Inventaris)</span>
             </h2>
             <p class="text-xs text-slate-500 mt-1">Sistem transfer FEFO dengan state machine: In Transit → Diterima (Otomatis buat batch tujuan)</p>
         </div>
@@ -88,11 +88,11 @@
                         <td class="py-4 px-4 font-sans">
                             <div class="flex items-center gap-2">
                                 <span class="px-2 py-0.5 rounded-md bg-slate-100 font-medium text-[11px] text-slate-700">
-                                    {{ $t->source_warehouse === 'ksr' ? 'KSR' : 'Poliklinik' }}
+                                    {{ $t->source_warehouse === 'ksr' ? 'Gudang Obat' : 'Gudang Inventaris' }}
                                 </span>
                                 <svg class="w-4 h-4 text-rose-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                                 <span class="px-2 py-0.5 rounded-md bg-rose-50 font-bold text-[11px] text-rose-900">
-                                    {{ $t->target_warehouse === 'ksr' ? 'KSR' : 'Poliklinik' }}
+                                    {{ $t->target_warehouse === 'ksr' ? 'Gudang Obat' : 'Gudang Inventaris' }}
                                 </span>
                             </div>
                         </td>
@@ -134,7 +134,7 @@
                             <div class="flex items-center justify-end gap-2">
                                 <!-- Receive Button (Only Destination or Super Admin) -->
                                 @if(auth()->user()->isSuperAdmin() || auth()->user()->warehouse === $t->target_warehouse)
-                                <form method="POST" action="{{ route('transfers.receive', $t) }}" onsubmit="return confirm('Konfirmasi penerimaan barang mutasi ini di gudang Anda?');">
+                                <form method="POST" action="{{ route('transfers.receive', $t) }}" data-swal-confirm="Konfirmasi penerimaan barang mutasi #{{ $t->transfer_no }} di gudang Anda? Stok akan otomatis bertambah." data-swal-title="Terima Mutasi" data-swal-icon="question" data-swal-ok="Ya, Terima Barang">
                                     @csrf
                                     <button type="submit" class="px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-xs transition-colors">
                                         Terima Barang
@@ -202,8 +202,8 @@
                         Gudang Tujuan Mutasi <span class="text-rose-600">*</span>
                     </label>
                     <select id="transfer_target" name="target_warehouse" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-rose-700 outline-none">
-                        <option value="poliklinik">Gudang Poliklinik INSTIKI</option>
-                        <option value="ksr">Gudang Markas KSR PMI</option>
+                        <option value="poliklinik">Gudang Inventaris</option>
+                        <option value="ksr">Gudang Obat</option>
                     </select>
                 </div>
 

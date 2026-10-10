@@ -15,7 +15,7 @@
                     <span>Kembali ke Katalog</span>
                 </a>
                 <span class="text-slate-300">•</span>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border {{ $item->category === 'obat' ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-emerald-100 text-emerald-800 border-emerald-300' }}">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border {{ $item->category === 'obat' ? 'bg-amber-100 text-amber-800 border-amber-300' : ($item->category === 'bhp_non_medis' ? 'bg-indigo-100 text-indigo-800 border-indigo-300' : 'bg-emerald-100 text-emerald-800 border-emerald-300') }}">
                     {{ $item->category_label }}
                 </span>
                 <span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[10px] font-medium">

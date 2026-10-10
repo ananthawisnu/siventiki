@@ -27,8 +27,8 @@ class DashboardController extends Controller
         $totalAssets = Asset::when($selectedWarehouse !== 'all', fn ($q) => $q->where('warehouse', $selectedWarehouse))
             ->count();
 
-        // Critical stock: BHP items with current stock <= min_stock
-        $bhpItems = Item::where('category', 'bhp')
+        // Critical stock: BHP & BHP Non Medis items with current stock <= min_stock
+        $bhpItems = Item::whereIn('category', ['bhp', 'bhp_non_medis'])
             ->where('min_stock', '>', 0)
             ->when($selectedWarehouse !== 'all', fn ($q) => $q->where('warehouse', $selectedWarehouse))
             ->with(['batches'])
@@ -120,6 +120,7 @@ class DashboardController extends Controller
         $labels = [];
         $obatData = [];
         $bhpData = [];
+        $bhpNonMedisData = [];
 
         for ($i = 5; $i >= 0; $i--) {
             $month = Carbon::now()->subMonths($i);
@@ -134,7 +135,7 @@ class DashboardController extends Controller
                 ->whereMonth('created_at', $month->month)
                 ->sum('quantity');
 
-            // Outbound BHP in this month
+            // Outbound BHP Medis in this month
             $bhpOutbound = Movement::where('kind', 'outbound')
                 ->whereHas('item', fn ($q) => $q->where('category', 'bhp'))
                 ->when($warehouse !== 'all', fn ($q) => $q->where('warehouse', $warehouse))
@@ -142,8 +143,17 @@ class DashboardController extends Controller
                 ->whereMonth('created_at', $month->month)
                 ->sum('quantity');
 
+            // Outbound BHP Non Medis in this month
+            $bhpNonMedisOutbound = Movement::where('kind', 'outbound')
+                ->whereHas('item', fn ($q) => $q->where('category', 'bhp_non_medis'))
+                ->when($warehouse !== 'all', fn ($q) => $q->where('warehouse', $warehouse))
+                ->whereYear('created_at', $month->year)
+                ->whereMonth('created_at', $month->month)
+                ->sum('quantity');
+
             $obatData[] = (int) $obatOutbound;
             $bhpData[] = (int) $bhpOutbound;
+            $bhpNonMedisData[] = (int) $bhpNonMedisOutbound;
         }
 
         return [
@@ -160,6 +170,12 @@ class DashboardController extends Controller
                     'backgroundColor' => '#059669', // Emerald/Sage
                     'borderColor' => '#047857',
                     'data' => $bhpData,
+                ],
+                [
+                    'label' => 'BHP Non Medis (Keluar)',
+                    'backgroundColor' => '#4f46e5', // Indigo
+                    'borderColor' => '#3730a3',
+                    'data' => $bhpNonMedisData,
                 ],
             ],
         ];

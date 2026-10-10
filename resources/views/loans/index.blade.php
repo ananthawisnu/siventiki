@@ -69,7 +69,7 @@
                             <div class="font-bold text-slate-900">{{ $l->asset->name }}</div>
                             <div class="text-[11px] font-mono text-rose-800 font-semibold">{{ $l->asset->code }}</div>
                             <span class="inline-block mt-0.5 px-2 py-0.2 rounded bg-slate-100 text-[10px] text-slate-600">
-                                Asal: {{ $l->source_warehouse === 'ksr' ? 'KSR' : 'Poliklinik' }}
+                                Asal: {{ $l->source_warehouse === 'ksr' ? 'Gudang Obat' : 'Gudang Inventaris' }}
                             </span>
                         </td>
 
@@ -99,7 +99,7 @@
 
                         <td class="py-4 px-6 text-right font-sans">
                             @if($l->status === 'dipinjam')
-                            <form method="POST" action="{{ route('loans.return', $l) }}" onsubmit="return confirm('Konfirmasi pengembalian aset ini? Status aset akan kembali menjadi Tersedia.');">
+                            <form method="POST" action="{{ route('loans.return', $l) }}" data-swal-confirm="Konfirmasi pengembalian aset '{{ $l->asset->name }}'? Status aset akan kembali menjadi Tersedia." data-swal-title="Pengembalian Aset" data-swal-icon="question" data-swal-ok="Ya, Kembalikan">
                                 @csrf
                                 <button type="submit" class="px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-xs transition-colors">
                                     Kembalikan
