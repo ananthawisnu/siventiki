@@ -7,6 +7,9 @@
     <title>Login - Sistem Inventaris KSR PMI Unit INSTIKI</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body class="h-full font-sans antialiased text-slate-100 flex items-center justify-center p-4 bg-radial from-[#7f1d2d] via-[#4c0519] to-[#0f172a] selection:bg-rose-500 selection:text-white relative overflow-hidden"
       x-data="{ 
@@ -81,7 +84,7 @@
                                required 
                                autofocus
                                placeholder="Contoh: 2401020002"
-                               class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-2xl text-slate-900 text-sm font-mono focus:ring-2 focus:ring-rose-700 focus:border-rose-700 outline-none transition-all placeholder:font-sans placeholder:text-slate-400">
+                               class="w-full pl-11 pr-4 py-3 bg-slate-50 border {{ $errors->has('nim') ? 'border-rose-500 ring-2 ring-rose-500/20' : 'border-slate-300' }} rounded-2xl text-slate-900 text-sm font-mono focus:ring-2 focus:ring-rose-700 focus:border-rose-700 outline-none transition-all placeholder:font-sans placeholder:text-slate-400">
                     </div>
                 </div>
 
@@ -100,7 +103,7 @@
                                x-model="password"
                                required 
                                placeholder="Masukkan kata sandi..."
-                               class="w-full pl-11 pr-11 py-3 bg-slate-50 border border-slate-300 rounded-2xl text-slate-900 text-sm focus:ring-2 focus:ring-rose-700 focus:border-rose-700 outline-none transition-all placeholder:text-slate-400">
+                               class="w-full pl-11 pr-11 py-3 bg-slate-50 border {{ $errors->has('password') ? 'border-rose-500 ring-2 ring-rose-500/20' : 'border-slate-300' }} rounded-2xl text-slate-900 text-sm focus:ring-2 focus:ring-rose-700 focus:border-rose-700 outline-none transition-all placeholder:text-slate-400">
                         <button type="button" @click="showPass = !showPass" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-700">
                             <svg x-show="!showPass" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             <svg x-show="showPass" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
@@ -131,6 +134,76 @@
         </p>
 
     </div>
+
+    <!-- Popup Alerts Logic -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        @if(session('login_error'))
+            Swal.fire({
+                icon: 'error',
+                title: {!! json_encode(session('login_error.title')) !!},
+                text: {!! json_encode(session('login_error.message')) !!},
+                confirmButtonText: 'Coba Lagi',
+                confirmButtonColor: '#7f1d2d',
+                background: '#ffffff',
+                backdrop: 'rgba(15, 23, 42, 0.75)',
+                customClass: {
+                    popup: 'rounded-3xl shadow-2xl border border-rose-100 p-6',
+                    title: 'text-xl font-bold text-slate-800',
+                    htmlContainer: 'text-sm text-slate-600',
+                    confirmButton: 'rounded-xl px-6 py-2.5 font-bold text-sm shadow-md transition-all'
+                }
+            });
+        @elseif($errors->any())
+            Swal.fire({
+                icon: 'warning',
+                title: 'Data Masuk Belum Sesuai',
+                html: '<ul class="text-left text-sm space-y-1.5 list-disc list-inside mt-2 text-slate-700">' + 
+                      {!! json_encode($errors->all()) !!}.map(err => '<li>' + err + '</li>').join('') + 
+                      '</ul>',
+                confirmButtonText: 'Periksa Kembali',
+                confirmButtonColor: '#7f1d2d',
+                background: '#ffffff',
+                backdrop: 'rgba(15, 23, 42, 0.75)',
+                customClass: {
+                    popup: 'rounded-3xl shadow-2xl border border-amber-100 p-6',
+                    title: 'text-xl font-bold text-slate-800',
+                    confirmButton: 'rounded-xl px-6 py-2.5 font-bold text-sm shadow-md transition-all'
+                }
+            });
+        @endif
+
+        @if(session('info'))
+            const InfoToast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3500,
+                timerProgressBar: true,
+                iconColor: '#2563eb'
+            });
+            InfoToast.fire({
+                icon: 'info',
+                title: {!! json_encode(session('info')) !!}
+            });
+        @endif
+
+        @if(session('success'))
+            const SuccessToast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3500,
+                timerProgressBar: true,
+                iconColor: '#16a34a'
+            });
+            SuccessToast.fire({
+                icon: 'success',
+                title: {!! json_encode(session('success')) !!}
+            });
+        @endif
+    });
+    </script>
 
 </body>
 </html>

@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class AuthController extends Controller
@@ -22,33 +23,69 @@ class AuthController extends Controller
 
     public function login(Request $request): RedirectResponse
     {
-        $credentials = $request->validate([
-            'nim' => ['required', 'string'],
-            'password' => ['required', 'string'],
-        ], [
-            'nim.required' => 'Nomor Induk Mahasiswa (NIM) wajib diisi.',
-            'password.required' => 'Password wajib diisi.',
-        ]);
-
-        $user = User::where('nim', $credentials['nim'])->first();
-
-        if (! $user || ! Hash::check($credentials['password'], $user->password)) {
-            return back()->withInput($request->only('nim'))->withErrors([
-                'nim' => 'NIM atau Password yang Anda masukkan salah.',
+        try {
+            $credentials = $request->validate([
+                'nim' => ['required', 'string'],
+                'password' => ['required', 'string'],
+            ], [
+                'nim.required' => 'Nomor Induk Mahasiswa (NIM) wajib diisi.',
+                'password.required' => 'Password wajib diisi.',
             ]);
+
+            $user = User::where('nim', $credentials['nim'])->first();
+
+            if (! $user) {
+                return back()->withInput($request->only('nim'))
+                    ->with('login_error', [
+                        'title' => 'Username / NIM Tidak Ditemukan',
+                        'message' => 'NIM atau pengguna tidak ditemukan dalam sistem. Pastikan NIM yang Anda masukkan sudah benar.',
+                    ])
+                    ->withErrors([
+                        'nim' => 'NIM tidak ditemukan dalam sistem.',
+                    ]);
+            }
+
+            if (! Hash::check($credentials['password'], $user->password)) {
+                return back()->withInput($request->only('nim'))
+                    ->with('login_error', [
+                        'title' => 'Password Salah',
+                        'message' => 'Kata sandi yang Anda masukkan salah. Silakan periksa kembali dan coba lagi.',
+                    ])
+                    ->withErrors([
+                        'password' => 'Kata sandi yang Anda masukkan salah.',
+                    ]);
+            }
+
+            if (! $user->is_active) {
+                return back()->withInput($request->only('nim'))
+                    ->with('login_error', [
+                        'title' => 'Akun Dinonaktifkan',
+                        'message' => 'Akun Anda sedang dinonaktifkan. Silakan hubungi Super Admin.',
+                    ])
+                    ->withErrors([
+                        'nim' => 'Akun Anda dinonaktifkan. Silakan hubungi Super Admin.',
+                    ]);
+            }
+
+            Auth::login($user, $request->boolean('remember'));
+            $request->session()->regenerate();
+
+            return redirect()->intended(route('dashboard'))
+                ->with('success', "Selamat datang kembali, {$user->name}!");
+        } catch (ValidationException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->withInput($request->only('nim'))
+                ->with('login_error', [
+                    'title' => 'Terjadi Kesalahan',
+                    'message' => 'Terjadi kendala pada sistem. Silakan coba beberapa saat lagi.',
+                ])
+                ->withErrors([
+                    'nim' => 'Terjadi kesalahan sistem saat memproses login.',
+                ]);
         }
-
-        if (! $user->is_active) {
-            return back()->withErrors([
-                'nim' => 'Akun Anda dinonaktifkan. Silakan hubungi Super Admin.',
-            ]);
-        }
-
-        Auth::login($user, $request->boolean('remember'));
-        $request->session()->regenerate();
-
-        return redirect()->intended(route('dashboard'))
-            ->with('success', "Selamat datang kembali, {$user->name}!");
     }
 
     public function logout(Request $request): RedirectResponse

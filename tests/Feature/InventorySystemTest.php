@@ -47,6 +47,45 @@ test('admin ksr can login with NIM 2401020003 and has ksr warehouse scope', func
         ->and($user->warehouse)->toBe('ksr');
 });
 
+test('login with non-existent NIM flashes user not found error popup and redirects back', function () {
+    $response = $this->from('/login')->post('/login', [
+        'nim' => '9999999999',
+        'password' => 'secret',
+    ]);
+
+    $response->assertRedirect('/login');
+    $response->assertSessionHas('login_error', function ($error) {
+        return $error['title'] === 'Username / NIM Tidak Ditemukan';
+    });
+    $response->assertSessionHasErrors(['nim']);
+    $this->assertGuest();
+});
+
+test('login with wrong password flashes wrong password error popup and redirects back', function () {
+    User::firstOrCreate(
+        ['nim' => '2401020002'],
+        [
+            'name' => 'Super Admin',
+            'password' => Hash::make('16marett'),
+            'role' => 'super_admin',
+            'warehouse' => 'all',
+            'is_active' => true,
+        ]
+    );
+
+    $response = $this->from('/login')->post('/login', [
+        'nim' => '2401020002',
+        'password' => 'salah-password-123',
+    ]);
+
+    $response->assertRedirect('/login');
+    $response->assertSessionHas('login_error', function ($error) {
+        return $error['title'] === 'Password Salah';
+    });
+    $response->assertSessionHasErrors(['password']);
+    $this->assertGuest();
+});
+
 test('fefo outbound algorithm deducts earliest expiry batches first', function () {
     $superAdmin = User::where('nim', '2401020002')->first();
     $this->actingAs($superAdmin);

@@ -19,16 +19,16 @@ $subDirectories = [
 ];
 
 foreach ($subDirectories as $subDir) {
-    $dir = $storagePath . $subDir;
-    if (!is_dir($dir)) {
+    $dir = $storagePath.$subDir;
+    if (! is_dir($dir)) {
         mkdir($dir, 0755, true);
     }
 }
 
 // Ensure compiled views directory exists
-if (!is_dir('/tmp/views')) {
+if (! is_dir('/tmp/views')) {
     mkdir('/tmp/views', 0755, true);
 }
 
 // Forward to Laravel public/index.php
-require __DIR__ . '/../public/index.php';
+require __DIR__.'/../public/index.php';
