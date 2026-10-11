@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -28,7 +29,7 @@ class AuthController extends Controller
                 'nim' => ['required', 'string'],
                 'password' => ['required', 'string'],
             ], [
-                'nim.required' => 'Nomor Induk Mahasiswa (NIM) wajib diisi.',
+                'nim.required' => 'Nomor Induk Mahasiswa (NIM) atau Username wajib diisi.',
                 'password.required' => 'Password wajib diisi.',
             ]);
 
@@ -38,10 +39,10 @@ class AuthController extends Controller
                 return back()->withInput($request->only('nim'))
                     ->with('login_error', [
                         'title' => 'Username / NIM Tidak Ditemukan',
-                        'message' => 'NIM atau pengguna tidak ditemukan dalam sistem. Pastikan NIM yang Anda masukkan sudah benar.',
+                        'message' => 'Username atau NIM tidak ditemukan dalam sistem. Pastikan data yang Anda masukkan sudah benar.',
                     ])
                     ->withErrors([
-                        'nim' => 'NIM tidak ditemukan dalam sistem.',
+                        'nim' => 'Username atau NIM tidak ditemukan dalam sistem.',
                     ]);
             }
 
@@ -109,17 +110,30 @@ class AuthController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-        $validated = $request->validate([
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
             'current_password' => ['nullable', 'required_with:new_password', 'current_password'],
             'new_password' => ['nullable', 'string', 'min:6', 'confirmed'],
-        ], [
+        ];
+
+        // Khusus Super Admin, Username / NIM dapat diubah
+        if ($user->isSuperAdmin()) {
+            $rules['nim'] = ['required', 'string', 'max:50', Rule::unique('users', 'nim')->ignore($user->id)];
+        }
+
+        $validated = $request->validate($rules, [
+            'nim.required' => 'Username / NIM wajib diisi.',
+            'nim.unique' => 'Username / NIM ini sudah digunakan oleh akun lain.',
             'name.required' => 'Nama lengkap wajib diisi.',
             'current_password.current_password' => 'Password saat ini tidak cocok.',
             'new_password.min' => 'Password baru minimal 6 karakter.',
             'new_password.confirmed' => 'Konfirmasi password baru tidak cocok.',
         ]);
+
+        if ($user->isSuperAdmin() && ! empty($validated['nim'])) {
+            $user->nim = $validated['nim'];
+        }
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];

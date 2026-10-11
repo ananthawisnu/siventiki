@@ -15,17 +15,32 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Super Admin Account
-        User::updateOrCreate(
-            ['nim' => '2401020002'],
-            [
+        $superAdmin = User::where('role', 'super_admin')
+            ->orWhere('nim', '2401020002')
+            ->orWhere('nim', 'superadminksr')
+            ->first();
+
+        if ($superAdmin) {
+            $superAdmin->update([
+                'nim' => 'superadminksr',
                 'name' => 'Super Admin KSR INSTIKI',
                 'email' => 'admin.ksr@instiki.ac.id',
-                'password' => Hash::make('16marett'),
+                'password' => Hash::make('password123'),
                 'role' => 'super_admin',
                 'warehouse' => 'all',
                 'is_active' => true,
-            ]
-        );
+            ]);
+        } else {
+            User::create([
+                'nim' => 'superadminksr',
+                'name' => 'Super Admin KSR INSTIKI',
+                'email' => 'admin.ksr@instiki.ac.id',
+                'password' => Hash::make('password123'),
+                'role' => 'super_admin',
+                'warehouse' => 'all',
+                'is_active' => true,
+            ]);
+        }
 
         // 2. Organization & Letterhead Base Settings
         Setting::set('org_name', 'KORPS SUKARELA PALANG MERAH INDONESIA');

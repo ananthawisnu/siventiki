@@ -171,10 +171,12 @@ Pastikan lingkungan pengembangan Anda telah terpasang:
 
 Setelah menjalankan `php artisan db:seed`, akun berikut siap digunakan:
 
-| Role | Username (NIM) | Password Default | Lingkup Akses |
+| Role | Username / NIM | Password Default | Lingkup Akses |
 |---|---|---|---|
-| **Super Admin** | `2401020002` | `16marett` | Semua Gudang (KSR & Poliklinik) |
+| **Super Admin** | `superadminksr` | `password123` | Semua Gudang (Gudang Obat & Gudang Inventaris) |
 
+> 💡 *Khusus akun **Super Admin**, username dan password dapat diganti secara langsung melalui menu **Profil** atau **Manajemen Pengguna**.*
+>
 > 💡 *Admin Gudang Obat (`admin_ksr`) dan Admin Gudang Inventaris (`admin_poliklinik`) dapat ditambahkan secara fleksibel melalui menu **Manajemen Pengguna** oleh Super Admin.*
 
 ---

@@ -12,10 +12,27 @@ use Illuminate\Support\Facades\Hash;
 
 uses(DatabaseTransactions::class);
 
-test('super admin can login with NIM 2401020002 and password 16marett', function () {
+test('super admin can login with username superadminksr and password password123', function () {
+    $superAdmin = User::where('role', 'super_admin')->first();
+    if (! $superAdmin) {
+        $superAdmin = User::create([
+            'nim' => 'superadminksr',
+            'name' => 'Super Admin KSR INSTIKI',
+            'password' => Hash::make('password123'),
+            'role' => 'super_admin',
+            'warehouse' => 'all',
+            'is_active' => true,
+        ]);
+    } else {
+        $superAdmin->update([
+            'nim' => 'superadminksr',
+            'password' => Hash::make('password123'),
+        ]);
+    }
+
     $response = $this->post('/login', [
-        'nim' => '2401020002',
-        'password' => '16marett',
+        'nim' => 'superadminksr',
+        'password' => 'password123',
     ]);
 
     $response->assertRedirect('/dashboard');
@@ -62,11 +79,12 @@ test('login with non-existent NIM flashes user not found error popup and redirec
 });
 
 test('login with wrong password flashes wrong password error popup and redirects back', function () {
-    User::firstOrCreate(
-        ['nim' => '2401020002'],
+    User::updateOrCreate(
+        ['role' => 'super_admin'],
         [
+            'nim' => 'superadminksr',
             'name' => 'Super Admin',
-            'password' => Hash::make('16marett'),
+            'password' => Hash::make('password123'),
             'role' => 'super_admin',
             'warehouse' => 'all',
             'is_active' => true,
@@ -74,7 +92,7 @@ test('login with wrong password flashes wrong password error popup and redirects
     );
 
     $response = $this->from('/login')->post('/login', [
-        'nim' => '2401020002',
+        'nim' => 'superadminksr',
         'password' => 'salah-password-123',
     ]);
 
@@ -86,8 +104,26 @@ test('login with wrong password flashes wrong password error popup and redirects
     $this->assertGuest();
 });
 
+test('super admin can change their username via profile update', function () {
+    $superAdmin = User::where('role', 'super_admin')->first();
+    $this->actingAs($superAdmin);
+
+    $newUsername = 'superadmin_new_'.rand(100, 999);
+
+    $response = $this->put('/profile', [
+        'name' => 'Super Admin Renamed',
+        'email' => 'admin.ksr@instiki.ac.id',
+        'nim' => $newUsername,
+    ]);
+
+    $response->assertSessionHasNoErrors();
+    $superAdmin->refresh();
+    expect($superAdmin->nim)->toBe($newUsername)
+        ->and($superAdmin->name)->toBe('Super Admin Renamed');
+});
+
 test('fefo outbound algorithm deducts earliest expiry batches first', function () {
-    $superAdmin = User::where('nim', '2401020002')->first();
+    $superAdmin = User::where('role', 'super_admin')->first();
     $this->actingAs($superAdmin);
 
     $code = 'TEST-FEFO-'.uniqid();
@@ -143,7 +179,7 @@ test('fefo outbound algorithm deducts earliest expiry batches first', function (
 });
 
 test('stock opname calculates delta and updates batch quantity', function () {
-    $superAdmin = User::where('nim', '2401020002')->first();
+    $superAdmin = User::where('role', 'super_admin')->first();
     $this->actingAs($superAdmin);
 
     $code = 'TEST-OPN-'.uniqid();
@@ -183,7 +219,7 @@ test('stock opname calculates delta and updates batch quantity', function () {
 });
 
 test('warehouse transfer lifecycle in_transit to received', function () {
-    $superAdmin = User::where('nim', '2401020002')->first();
+    $superAdmin = User::where('role', 'super_admin')->first();
     $this->actingAs($superAdmin);
 
     $uniqueName = 'Kasa Steril Transfer '.uniqid();
@@ -233,7 +269,7 @@ test('warehouse transfer lifecycle in_transit to received', function () {
 });
 
 test('asset status workflow and timeline logging', function () {
-    $superAdmin = User::where('nim', '2401020002')->first();
+    $superAdmin = User::where('role', 'super_admin')->first();
     $this->actingAs($superAdmin);
 
     $asset = Asset::create([
@@ -269,7 +305,7 @@ test('asset status workflow and timeline logging', function () {
 });
 
 test('report print and export routes render correctly', function () {
-    $superAdmin = User::where('nim', '2401020002')->first();
+    $superAdmin = User::where('role', 'super_admin')->first();
     $this->actingAs($superAdmin);
 
     $resIndex = $this->get('/reports?kind=movements');

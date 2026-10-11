@@ -42,7 +42,7 @@
                     <span>KSR PMI Unit INSTIKI</span>
                 </div>
                 <h1 class="text-2xl font-black tracking-tight text-slate-900">Sistem Inventaris Medis</h1>
-                <p class="text-xs text-slate-500 mt-1">Silakan masuk menggunakan NIM akun Anda</p>
+                <p class="text-xs text-slate-500 mt-1">Silakan masuk menggunakan Username atau NIM akun Anda</p>
             </div>
 
             <!-- Error Notification -->
@@ -71,7 +71,7 @@
                 <!-- NIM Input (Username) -->
                 <div>
                     <label for="nim" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                        Nomor Induk Mahasiswa (NIM)
+                        Username / NIM
                     </label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -83,7 +83,7 @@
                                x-model="nim"
                                required 
                                autofocus
-                               placeholder="Contoh: 2401020002"
+                               placeholder="Contoh: superadminksr atau 2401020002"
                                class="w-full pl-11 pr-4 py-3 bg-slate-50 border {{ $errors->has('nim') ? 'border-rose-500 ring-2 ring-rose-500/20' : 'border-slate-300' }} rounded-2xl text-slate-900 text-sm font-mono focus:ring-2 focus:ring-rose-700 focus:border-rose-700 outline-none transition-all placeholder:font-sans placeholder:text-slate-400">
                     </div>
                 </div>

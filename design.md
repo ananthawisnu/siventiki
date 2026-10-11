@@ -209,7 +209,7 @@ PUT    /api/settings/logos          Upload logo (Super Admin)
 
 ## 🔑 Login Akses
 
-- username: `2401020002`
-- Password: `16marett`
+- username: `superadminksr`
+- Password: `password123`
 
 ## 🌐 Environment

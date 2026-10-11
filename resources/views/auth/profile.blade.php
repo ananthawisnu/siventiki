@@ -41,16 +41,26 @@
             @method('PUT')
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- NIM (Readonly) -->
+                <!-- NIM / Username -->
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                        Nomor Induk Mahasiswa (NIM)
+                        Username / NIM @if($user->isSuperAdmin()) <span class="text-rose-600 font-normal normal-case">(Khusus Super Admin dapat diganti)</span> @endif
                     </label>
+                    @if($user->isSuperAdmin())
+                    <input type="text" 
+                           id="nim"
+                           name="nim"
+                           value="{{ old('nim', $user->nim) }}" 
+                           required 
+                           class="w-full px-4 py-3 bg-slate-50 border {{ $errors->has('nim') ? 'border-rose-500 ring-2 ring-rose-500/20' : 'border-slate-300' }} rounded-2xl text-slate-900 text-sm font-mono focus:ring-2 focus:ring-rose-700 outline-none transition-all">
+                    <p class="text-[11px] text-slate-500 mt-1">Username akun Super Admin untuk login ke dalam sistem.</p>
+                    @else
                     <input type="text" 
                            value="{{ $user->nim }}" 
                            readonly 
                            class="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-2xl text-slate-500 text-sm font-mono cursor-not-allowed">
                     <p class="text-[11px] text-slate-400 mt-1">NIM berfungsi sebagai username permanen.</p>
+                    @endif
                 </div>
 
                 <!-- Name -->

@@ -212,8 +212,15 @@
                 @method('PUT')
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">NIM (Username)</label>
-                    <input type="text" :value="selectedUser.nim" readonly class="w-full px-3.5 py-2 bg-slate-100 border border-slate-200 rounded-xl text-sm font-mono text-slate-500">
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">
+                        Username / NIM <span x-show="selectedUser.role === 'super_admin'" class="text-rose-600 font-normal normal-case">(Bisa diubah khusus Super Admin)</span>
+                    </label>
+                    <input type="text" 
+                           name="nim" 
+                           x-model="selectedUser.nim" 
+                           :readonly="selectedUser.role !== 'super_admin'" 
+                           :class="selectedUser.role === 'super_admin' ? 'bg-slate-50 border-slate-300 focus:ring-2 focus:ring-rose-700 text-slate-900' : 'bg-slate-100 border-slate-200 cursor-not-allowed text-slate-500'" 
+                           class="w-full px-3.5 py-2 border rounded-xl text-sm font-mono outline-none">
                 </div>
 
                 <div>

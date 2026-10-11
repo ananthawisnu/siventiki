@@ -60,11 +60,23 @@ class UserController extends Controller
 
     public function update(Request $request, User $user): RedirectResponse
     {
-        $validated = $request->validate([
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
             'role' => ['required', Rule::in(['super_admin', 'admin_ksr', 'admin_poliklinik'])],
             'password' => ['nullable', 'string', 'min:6'],
+        ];
+
+        // Khusus Super Admin, Username / NIM dapat diubah
+        if ($user->isSuperAdmin() || $request->input('role') === 'super_admin') {
+            $rules['nim'] = ['required', 'string', 'max:50', Rule::unique('users', 'nim')->ignore($user->id)];
+        }
+
+        $validated = $request->validate($rules, [
+            'nim.required' => 'Username / NIM wajib diisi.',
+            'nim.unique' => 'Username / NIM ini sudah digunakan oleh akun lain.',
+            'name.required' => 'Nama lengkap wajib diisi.',
+            'password.min' => 'Password minimal 6 karakter.',
         ]);
 
         $warehouse = match ($validated['role']) {
@@ -73,6 +85,10 @@ class UserController extends Controller
             'admin_poliklinik' => 'poliklinik',
             default => 'ksr',
         };
+
+        if (isset($validated['nim']) && ($user->isSuperAdmin() || $validated['role'] === 'super_admin')) {
+            $user->nim = $validated['nim'];
+        }
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];

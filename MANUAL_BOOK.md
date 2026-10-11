@@ -30,13 +30,16 @@ Sistem Inventaris KSR PMI Unit INSTIKI dirancang khusus untuk mengelola logistik
 
 ## 2. Hak Akses & Role Pengguna
 
-Login ke dalam sistem menggunakan **NIM (Nomor Induk Mahasiswa)** sebagai Username dan Password terdaftar.
+Login ke dalam sistem menggunakan **Username / NIM** dan Password terdaftar.
 
-| Role | Cakupan Akses | Fitur Khusus |
-|---|---|---|
-| **Super Admin** | Akses Penuh ke **Semua Gudang** (Gudang Obat + Gudang Inventaris) | Manajemen Akun, Konfigurasi Kop Surat & Tanda Tangan, Filter Gudang Global |
-| **Admin Gudang Obat** | Terbatas pada data & pergerakan **Gudang Obat** | Katalog Obat, Inbound/Outbound/Opname Gudang Obat, Pengiriman Mutasi |
-| **Admin Gudang Inventaris** | Terbatas pada data & pergerakan **Gudang Inventaris** | Registrasi Aset, Peminjaman, Penerimaan Mutasi, Pemeliharaan Aset |
+| Role | Username Default | Password Default | Cakupan Akses | Fitur Khusus |
+|---|---|---|---|---|
+| **Super Admin** | `superadminksr` *(dapat diubah)* | `password123` | Akses Penuh ke **Semua Gudang** (Gudang Obat + Gudang Inventaris) | Manajemen Akun, Konfigurasi Kop Surat & Tanda Tangan, Filter Gudang Global, Ubah Username/NIM Akun |
+| **Admin Gudang Obat** | Didaftarkan via NIM | Didaftarkan oleh Super Admin | Terbatas pada data & pergerakan **Gudang Obat** | Katalog Obat, Inbound/Outbound/Opname Gudang Obat, Pengiriman Mutasi |
+| **Admin Gudang Inventaris** | Didaftarkan via NIM | Didaftarkan oleh Super Admin | Terbatas pada data & pergerakan **Gudang Inventaris** | Registrasi Aset, Peminjaman, Penerimaan Mutasi, Pemeliharaan Aset |
+
+> 📌 **Catatan Khusus Super Admin**:
+> Khusus akun **Super Admin**, username dapat diganti kapan saja secara fleksibel (tidak terkunci pada format NIM angka) melalui menu **Profil Pengguna** atau **Manajemen Pengguna**. Sedangkan untuk akun Admin Gudang, username tetap dikunci menggunakan NIM mahasiswa untuk standarisasi identitas anggota.
 
 ---
 
@@ -152,7 +155,8 @@ Menu **Laporan & LPJ**:
 
 ## 10. Pengaturan Super Admin & Pengguna
 
-* **Manajemen Pengguna**: Tambah anggota baru, ubah role (Admin Gudang Obat / Admin Gudang Inventaris / Super Admin), reset password, atau nonaktifkan akun anggota yang telah demisioner.
+* **Manajemen Pengguna**: Tambah anggota baru, ubah role (Admin Gudang Obat / Admin Gudang Inventaris / Super Admin), reset password, ubah username khusus akun Super Admin, atau nonaktifkan akun anggota yang telah demisioner.
+* **Profil Super Admin**: Akses menu Profil untuk memperbarui nama, email, password, serta username Super Admin (`superadminksr` atau kustom).
 * **Pengaturan Logo & Kop**: Unggah logo resmi KSR PMI, logo kampus INSTIKI, atur nama instansi, alamat markas, dan nama/NIM penandatangan laporan resmi.
 
 ---
