@@ -29,12 +29,18 @@
             
             <!-- Top Branding & Logos -->
             <div class="text-center mb-8">
-                <div class="flex items-center justify-center gap-3 mb-4">
-                    <!-- PMI Emblem Badge -->
-                    <div class="w-14 h-14 rounded-2xl bg-white shadow-lg border border-rose-100 flex items-center justify-center p-2 transform hover:scale-105 transition-transform">
-                        <svg viewBox="0 0 24 24" class="w-10 h-10 fill-[#dc2626]">
-                            <path d="M9 4h6v5h5v6h-5v5H9v-5H4V9h5V4z"/>
-                        </svg>
+                <div class="flex items-center justify-center gap-4 mb-4">
+                    <!-- Logo INSTIKI (Kiri) -->
+                    <div class="w-16 h-16 rounded-2xl bg-white shadow-lg border border-slate-100 flex items-center justify-center p-2 transform hover:scale-105 transition-transform">
+                        <img src="{{ asset('images/logo-instiki.png') }}" alt="Logo INSTIKI" class="w-full h-full object-contain">
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="w-px h-8 bg-slate-200"></div>
+
+                    <!-- Logo KSR PMI (Kanan) -->
+                    <div class="w-16 h-16 rounded-2xl bg-white shadow-lg border border-rose-100 flex items-center justify-center p-2 transform hover:scale-105 transition-transform">
+                        <img src="{{ asset('images/logo-ksr.png') }}" alt="Logo KSR PMI" class="w-full h-full object-contain">
                     </div>
                 </div>
 

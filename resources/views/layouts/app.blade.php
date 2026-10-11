@@ -41,20 +41,20 @@
                class="fixed lg:static inset-y-0 left-0 z-50 w-72 bg-gradient-to-b from-[#7f1d2d] via-[#881337] to-[#4c0519] text-white flex flex-col transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none no-print">
             
             <!-- Brand / Header -->
-            <div class="h-20 flex items-center justify-between px-6 border-b border-rose-900/50 bg-black/10">
+            <div class="h-20 flex items-center justify-between px-5 border-b border-rose-900/50 bg-black/10">
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-3 group">
-                    <div class="w-10 h-10 rounded-xl bg-white p-1.5 shadow-md flex items-center justify-center transition-transform group-hover:scale-105">
-                        <!-- PMI Red Cross SVG -->
-                        <svg viewBox="0 0 24 24" class="w-7 h-7 fill-red-600">
-                            <path d="M9 4h6v5h5v6h-5v5H9v-5H4V9h5V4z"/>
-                        </svg>
+                    <div class="flex items-center gap-1.5 bg-white p-1.5 rounded-xl shadow-md transition-transform group-hover:scale-105 shrink-0 border border-rose-200/40">
+                        <!-- Logo INSTIKI (Kiri) -->
+                        <img src="{{ asset('images/logo-instiki.png') }}" alt="Logo INSTIKI" class="w-6 h-6 object-contain">
+                        <div class="w-px h-4 bg-slate-200"></div>
+                        <!-- Logo KSR PMI (Kanan) -->
+                        <img src="{{ asset('images/logo-ksr.png') }}" alt="Logo KSR PMI" class="w-6 h-6 object-contain">
                     </div>
                     <div>
-                        <div class="font-bold text-base tracking-wide text-white flex items-center gap-1.5">
-                            <span>KSR PMI</span>
-                            <span class="text-xs px-1.5 py-0.5 rounded bg-rose-500/30 text-rose-200 border border-rose-400/30 font-mono">INSTIKI</span>
+                        <div class="font-bold text-sm tracking-wide text-white flex items-center gap-1.5">
+                            <span>KSR PMI UNIT INSTIKI</span>
                         </div>
-                        <p class="text-[11px] text-rose-200/70 font-medium">Sistem Inventaris Medis</p>
+                        <p class="text-[11px] text-rose-200/70 font-medium">Sistem Inventaris POLIKLINIK</p>
                     </div>
                 </a>
                 <button class="lg:hidden p-1.5 text-rose-200 hover:text-white rounded-lg hover:bg-rose-900/50" @click="sidebarOpen = false">
