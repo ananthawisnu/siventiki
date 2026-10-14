@@ -14,15 +14,30 @@ class Setting extends Model
         'value',
     ];
 
+    /**
+     * In-memory cache for all settings during the lifecycle of the request
+     *
+     * @var array<string, ?string>|null
+     */
+    protected static ?array $runtimeCache = null;
+
     public static function get(string $key, $default = null): ?string
     {
-        $setting = self::where('key', $key)->first();
+        if (self::$runtimeCache === null) {
+            try {
+                self::$runtimeCache = self::pluck('value', 'key')->toArray();
+            } catch (\Throwable) {
+                return $default;
+            }
+        }
 
-        return $setting ? $setting->value : $default;
+        return self::$runtimeCache[$key] ?? $default;
     }
 
     public static function set(string $key, ?string $value): void
     {
+        self::$runtimeCache = null;
+
         self::updateOrCreate(
             ['key' => $key],
             ['value' => $value]

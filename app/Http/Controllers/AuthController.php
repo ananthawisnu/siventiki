@@ -72,6 +72,7 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             return redirect()->intended(route('dashboard'))
+                ->with('welcome_user', $user->name)
                 ->with('success', "Selamat datang kembali, {$user->name}!");
         } catch (ValidationException $e) {
             throw $e;
@@ -91,11 +92,15 @@ class AuthController extends Controller
 
     public function logout(Request $request): RedirectResponse
     {
+        $userName = Auth::user()?->name ?? 'Rekan KSR';
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login')->with('info', 'Anda telah berhasil logout.');
+        return redirect()->route('login')
+            ->with('logout_user_name', $userName)
+            ->with('info', 'Anda telah berhasil logout.');
     }
 
     public function profile(): View

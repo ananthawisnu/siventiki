@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -57,17 +58,16 @@ class DashboardController extends Controller
         $totalExpiringAlertCount = $allExpiringBatches->count();
         $expiredCount = $expiredBatches->count();
 
-        // 2. Asset Status Distribution
+        // 2. Asset Status Distribution (Optimized into 1 query)
+        $assetStatsCounts = Asset::when($selectedWarehouse !== 'all', fn ($q) => $q->where('warehouse', $selectedWarehouse))
+            ->selectRaw('status, count(*) as count')
+            ->groupBy('status')
+            ->pluck('count', 'status');
+
         $assetStats = [
-            'tersedia' => Asset::where('status', 'tersedia')
-                ->when($selectedWarehouse !== 'all', fn ($q) => $q->where('warehouse', $selectedWarehouse))
-                ->count(),
-            'digunakan' => Asset::where('status', 'digunakan')
-                ->when($selectedWarehouse !== 'all', fn ($q) => $q->where('warehouse', $selectedWarehouse))
-                ->count(),
-            'rusak' => Asset::where('status', 'rusak')
-                ->when($selectedWarehouse !== 'all', fn ($q) => $q->where('warehouse', $selectedWarehouse))
-                ->count(),
+            'tersedia' => (int) ($assetStatsCounts['tersedia'] ?? 0),
+            'digunakan' => (int) ($assetStatsCounts['digunakan'] ?? 0),
+            'rusak' => (int) ($assetStatsCounts['rusak'] ?? 0),
         ];
 
         // 3. Recent 8 Movements
@@ -117,6 +117,30 @@ class DashboardController extends Controller
 
     private function get6MonthTrendData(string $warehouse): array
     {
+        $startDate = Carbon::now()->subMonths(5)->startOfMonth();
+        $endDate = Carbon::now()->endOfMonth();
+
+        $driver = DB::getDriverName();
+        $dateExpr = $driver === 'sqlite'
+            ? "strftime('%Y-%m', movements.created_at)"
+            : "DATE_FORMAT(movements.created_at, '%Y-%m')";
+
+        $rawSummary = Movement::query()
+            ->join('items', 'items.id', '=', 'movements.item_id')
+            ->where('movements.kind', 'outbound')
+            ->whereIn('items.category', ['obat', 'bhp', 'bhp_non_medis'])
+            ->when($warehouse !== 'all', fn ($q) => $q->where('movements.warehouse', $warehouse))
+            ->where('movements.created_at', '>=', $startDate)
+            ->where('movements.created_at', '<=', $endDate)
+            ->selectRaw("{$dateExpr} as ym, items.category, SUM(movements.quantity) as total_qty")
+            ->groupBy('ym', 'items.category')
+            ->get();
+
+        $grouped = [];
+        foreach ($rawSummary as $row) {
+            $grouped[$row->ym][$row->category] = (int) $row->total_qty;
+        }
+
         $labels = [];
         $obatData = [];
         $bhpData = [];
@@ -127,33 +151,9 @@ class DashboardController extends Controller
             $monthKey = $month->format('Y-m');
             $labels[] = $month->translatedFormat('M Y');
 
-            // Outbound Obat in this month
-            $obatOutbound = Movement::where('kind', 'outbound')
-                ->whereHas('item', fn ($q) => $q->where('category', 'obat'))
-                ->when($warehouse !== 'all', fn ($q) => $q->where('warehouse', $warehouse))
-                ->whereYear('created_at', $month->year)
-                ->whereMonth('created_at', $month->month)
-                ->sum('quantity');
-
-            // Outbound BHP Medis in this month
-            $bhpOutbound = Movement::where('kind', 'outbound')
-                ->whereHas('item', fn ($q) => $q->where('category', 'bhp'))
-                ->when($warehouse !== 'all', fn ($q) => $q->where('warehouse', $warehouse))
-                ->whereYear('created_at', $month->year)
-                ->whereMonth('created_at', $month->month)
-                ->sum('quantity');
-
-            // Outbound BHP Non Medis in this month
-            $bhpNonMedisOutbound = Movement::where('kind', 'outbound')
-                ->whereHas('item', fn ($q) => $q->where('category', 'bhp_non_medis'))
-                ->when($warehouse !== 'all', fn ($q) => $q->where('warehouse', $warehouse))
-                ->whereYear('created_at', $month->year)
-                ->whereMonth('created_at', $month->month)
-                ->sum('quantity');
-
-            $obatData[] = (int) $obatOutbound;
-            $bhpData[] = (int) $bhpOutbound;
-            $bhpNonMedisData[] = (int) $bhpNonMedisOutbound;
+            $obatData[] = $grouped[$monthKey]['obat'] ?? 0;
+            $bhpData[] = $grouped[$monthKey]['bhp'] ?? 0;
+            $bhpNonMedisData[] = $grouped[$monthKey]['bhp_non_medis'] ?? 0;
         }
 
         return [

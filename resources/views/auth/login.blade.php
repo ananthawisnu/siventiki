@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <title>Login - Sistem Inventaris KSR PMI Unit INSTIKI</title>
+    <!-- Preconnect CDN -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
     <!-- SweetAlert2 -->
@@ -179,7 +183,25 @@
             });
         @endif
 
-        @if(session('info'))
+        @if(session('logout_user_name'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Semoga Sehat Selalu, ' + {!! json_encode(session('logout_user_name')) !!} + '!',
+                text: 'Terima kasih atas dedikasi dan pelayanan kemanusiaan Anda di KSR PMI Unit INSTIKI. Anda telah berhasil keluar dari sistem.',
+                confirmButtonText: 'Sama-sama',
+                confirmButtonColor: '#7f1d2d',
+                background: '#ffffff',
+                backdrop: 'rgba(15, 23, 42, 0.75)',
+                timer: 4500,
+                timerProgressBar: true,
+                customClass: {
+                    popup: 'rounded-3xl shadow-2xl border border-rose-100 p-6',
+                    title: 'text-xl font-bold text-slate-800',
+                    htmlContainer: 'text-sm text-slate-600',
+                    confirmButton: 'rounded-xl px-6 py-2.5 font-bold text-sm shadow-md transition-all'
+                }
+            });
+        @elseif(session('info'))
             const InfoToast = Swal.mixin({
                 toast: true,
                 position: 'top-end',

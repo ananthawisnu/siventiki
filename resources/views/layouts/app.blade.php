@@ -7,11 +7,12 @@
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <title>@yield('title', 'Sistem Inventaris') - KSR PMI Unit INSTIKI</title>
 
+    <!-- CDN Preconnect & DNS-Prefetch for Speed -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
     <!-- Tailwind & App CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    <!-- Chart.js for Interactive Charts -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
     <!-- Alpine.js for lightweight reactivity -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
@@ -237,9 +238,9 @@
                                 </a>
                             </div>
                             <div class="py-1">
-                                <form method="POST" action="{{ route('logout') }}">
+                                <form method="POST" action="{{ route('logout') }}" data-swal-confirm="Apakah Anda yakin ingin keluar dari sistem inventaris?" data-swal-title="Konfirmasi Logout" data-swal-icon="question" data-swal-ok="Ya, Keluar">
                                     @csrf
-                                    <button type="submit" class="w-full text-left flex items-center gap-2 px-4 py-2 text-xs text-rose-700 hover:bg-rose-50 font-medium">
+                                    <button type="submit" class="w-full text-left flex items-center gap-2 px-4 py-2 text-xs text-rose-700 hover:bg-rose-50 font-medium cursor-pointer">
                                         <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                                         Keluar dari Sistem (Logout)
                                     </button>
@@ -250,9 +251,12 @@
                 </div>
             </header>
 
-            <!-- FLASH MESSAGES via SweetAlert2 Toast -->
+            <!-- FLASH MESSAGES via SweetAlert2 -->
             <div style="display:none;">
-                @if(session('success'))
+                @if(session('welcome_user'))
+                <span id="flash-welcome">{{ session('welcome_user') }}</span>
+                @endif
+                @if(session('success') && !session('welcome_user'))
                 <span id="flash-success">{{ session('success') }}</span>
                 @endif
                 @if(session('info'))
@@ -294,11 +298,29 @@
     });
 
     // ── Flash Messages ─────────────────────────────────────────────────────────
+    const flashWelcome = document.getElementById('flash-welcome');
     const flashSuccess = document.getElementById('flash-success');
     const flashInfo    = document.getElementById('flash-info');
     const flashErrors  = document.getElementById('flash-errors');
 
-    if (flashSuccess) {
+    if (flashWelcome) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Selamat Datang, ' + flashWelcome.textContent.trim() + '!',
+            text: 'Selamat bertugas di Sistem Inventaris KSR PMI Unit INSTIKI.',
+            confirmButtonText: 'Mulai Bekerja',
+            confirmButtonColor: '#7f1d2d',
+            background: '#ffffff',
+            timer: 4500,
+            timerProgressBar: true,
+            customClass: {
+                popup: 'rounded-3xl shadow-2xl border border-rose-100 p-6',
+                title: 'text-xl font-bold text-slate-800',
+                htmlContainer: 'text-sm text-slate-600',
+                confirmButton: 'rounded-xl px-6 py-2.5 font-bold text-sm shadow-md transition-all'
+            }
+        });
+    } else if (flashSuccess) {
         SwalToast.fire({
             icon: 'success',
             title: flashSuccess.textContent.trim(),

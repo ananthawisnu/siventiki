@@ -36,7 +36,25 @@ test('super admin can login with username superadminksr and password password123
     ]);
 
     $response->assertRedirect('/dashboard');
+    $response->assertSessionHas('welcome_user', $superAdmin->name);
     $this->assertAuthenticated();
+});
+
+test('logout flashes logout_user_name for SweetAlert popup and redirects to login', function () {
+    $user = User::create([
+        'nim' => 'test_logout_'.rand(1000, 9999),
+        'name' => 'Wisnu Anantha',
+        'password' => Hash::make('password'),
+        'role' => 'admin_ksr',
+        'warehouse' => 'ksr',
+        'is_active' => true,
+    ]);
+
+    $response = $this->actingAs($user)->post('/logout');
+
+    $response->assertRedirect('/login');
+    $response->assertSessionHas('logout_user_name', 'Wisnu Anantha');
+    $this->assertGuest();
 });
 
 test('admin ksr can login with NIM 2401020003 and has ksr warehouse scope', function () {
