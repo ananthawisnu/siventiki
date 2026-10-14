@@ -51,5 +51,8 @@ class DatabaseSeeder extends Seeder
         Setting::set('leader_nim', '2401020002');
         Setting::set('officer_name', 'Ni Putu Ayu Saraswati');
         Setting::set('officer_nim', '2401020015');
+
+        // 3. Initial Inventory Items & Fixed Assets Import
+        $this->call(InventoryDataImportSeeder::class);
     }
 }

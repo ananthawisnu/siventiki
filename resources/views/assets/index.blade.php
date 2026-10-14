@@ -11,11 +11,11 @@
     selectedAsset: {},
     actionType: 'borrow', // 'borrow', 'return', 'damage', 'repair'
     openEdit(asset) {
-        this.selectedAsset = asset;
+        this.selectedAsset = Object.assign({}, asset);
         this.editModalOpen = true;
     },
     openAction(asset, action) {
-        this.selectedAsset = asset;
+        this.selectedAsset = Object.assign({}, asset);
         this.actionType = action;
         this.actionModalOpen = true;
     }
@@ -105,6 +105,19 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100 font-mono">
                     @foreach($assets as $asset)
+                    @php
+                        $assetData = [
+                            'id' => $asset->id,
+                            'code' => $asset->code,
+                            'name' => $asset->name,
+                            'warehouse' => $asset->warehouse,
+                            'acquisition_year' => $asset->acquisition_year,
+                            'funding_source' => $asset->funding_source,
+                            'location' => $asset->location ?? '',
+                            'status' => $asset->status,
+                            'description' => $asset->description ?? '',
+                        ];
+                    @endphp
                     <tr class="hover:bg-slate-50/60 transition-colors">
                         <!-- Code & Name -->
                         <td class="py-4 px-6 font-sans">
@@ -139,7 +152,7 @@
                             </span>
                         </td>
 
-                        <!-- Actions (4 Status Actions + Timeline) -->
+                        <!-- Actions (4 Status Actions + Timeline + Edit + Delete) -->
                         <td class="py-4 px-6 text-right font-sans">
                             <div class="flex items-center justify-end gap-1.5">
                                 
@@ -154,13 +167,13 @@
                                 <!-- Action: Pinjam (if Tersedia) -->
                                 @if($asset->status === 'tersedia')
                                 <button type="button" 
-                                        @click="openAction({{ json_encode($asset) }}, 'borrow')"
-                                        class="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 font-bold text-xs transition-colors">
+                                        @click="openAction(@js($assetData), 'borrow')"
+                                        class="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 font-bold text-xs transition-colors cursor-pointer">
                                     Pinjam
                                 </button>
                                 <button type="button" 
-                                        @click="openAction({{ json_encode($asset) }}, 'damage')"
-                                        class="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-900 border border-rose-200 font-bold text-xs transition-colors">
+                                        @click="openAction(@js($assetData), 'damage')"
+                                        class="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-900 border border-rose-200 font-bold text-xs transition-colors cursor-pointer">
                                     Rusak
                                 </button>
                                 @endif
@@ -168,8 +181,8 @@
                                 <!-- Action: Kembalikan (if Digunakan) -->
                                 @if($asset->status === 'digunakan')
                                 <button type="button" 
-                                        @click="openAction({{ json_encode($asset) }}, 'return')"
-                                        class="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 font-bold text-xs transition-colors">
+                                        @click="openAction(@js($assetData), 'return')"
+                                        class="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 font-bold text-xs transition-colors cursor-pointer">
                                     Kembalikan
                                 </button>
                                 @endif
@@ -177,16 +190,17 @@
                                 <!-- Action: Perbaiki (if Rusak) -->
                                 @if($asset->status === 'rusak')
                                 <button type="button" 
-                                        @click="openAction({{ json_encode($asset) }}, 'repair')"
-                                        class="px-2.5 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-200 font-bold text-xs transition-colors">
+                                        @click="openAction(@js($assetData), 'repair')"
+                                        class="px-2.5 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-200 font-bold text-xs transition-colors cursor-pointer">
                                     Perbaiki
                                 </button>
                                 @endif
 
-                                <!-- Edit -->
+                                <!-- Edit Button -->
                                 <button type="button" 
-                                        @click="openEdit({{ json_encode($asset) }})" 
-                                        class="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100">
+                                        @click="openEdit(@js($assetData))" 
+                                        class="p-1.5 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+                                        title="Ubah Data Aset">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                 </button>
 
@@ -194,7 +208,7 @@
                                 <form method="POST" action="{{ route('assets.destroy', $asset) }}" data-swal-confirm="Apakah Anda yakin ingin menghapus aset '{{ $asset->name }}'?" data-swal-title="Hapus Aset" data-swal-icon="warning" data-swal-ok="Ya, Hapus">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="p-1.5 rounded-xl text-rose-500 hover:text-rose-800 hover:bg-rose-50" title="Hapus Aset">
+                                    <button type="submit" class="p-1.5 rounded-xl text-rose-500 hover:text-rose-800 hover:bg-rose-50 cursor-pointer" title="Hapus Aset">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                     </button>
                                 </form>
@@ -285,6 +299,93 @@
                     </button>
                     <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#7f1d2d] hover:bg-[#991b1b] text-white font-bold text-xs shadow-md">
                         Daftarkan Aset
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: EDIT ASSET -->
+    <div x-show="editModalOpen" 
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs" 
+         x-transition 
+         style="display: none;">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 lg:p-8 shadow-2xl border border-slate-100 relative max-h-[90vh] overflow-y-auto" @click.outside="editModalOpen = false">
+            <div class="flex items-center justify-between mb-5 pb-3 border-b border-slate-100">
+                <div>
+                    <h3 class="text-base font-bold text-slate-900">Ubah Data Aset</h3>
+                    <p class="text-xs text-slate-500 font-mono mt-0.5" x-text="selectedAsset.code"></p>
+                </div>
+                <button type="button" @click="editModalOpen = false" class="text-slate-400 hover:text-slate-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <form :action="'/assets/' + selectedAsset.id" method="POST" class="space-y-4">
+                @csrf
+                @method('PUT')
+
+                <!-- Asset Code (Read Only) -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Kode Aset (Permanen)</label>
+                    <input type="text" :value="selectedAsset.code" readonly class="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm font-mono text-slate-500 cursor-not-allowed">
+                </div>
+
+                <!-- Asset Name -->
+                <div>
+                    <label for="edit_asset_name" class="block text-xs font-bold text-slate-700 uppercase mb-1">
+                        Nama Aset <span class="text-rose-600">*</span>
+                    </label>
+                    <input type="text" id="edit_asset_name" name="name" x-model="selectedAsset.name" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-rose-700 outline-none">
+                </div>
+
+                <!-- Year & Funding Source -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="edit_asset_year" class="block text-xs font-bold text-slate-700 uppercase mb-1">
+                            Tahun Perolehan <span class="text-rose-600">*</span>
+                        </label>
+                        <input type="number" id="edit_asset_year" name="acquisition_year" x-model="selectedAsset.acquisition_year" min="2000" max="{{ date('Y') + 1 }}" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-mono focus:ring-2 focus:ring-rose-700 outline-none">
+                    </div>
+
+                    <div>
+                        <label for="edit_asset_funding" class="block text-xs font-bold text-slate-700 uppercase mb-1">
+                            Sumber Dana <span class="text-rose-600">*</span>
+                        </label>
+                        <input type="text" id="edit_asset_funding" name="funding_source" x-model="selectedAsset.funding_source" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-rose-700 outline-none">
+                    </div>
+                </div>
+
+                <!-- Location & Status -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="edit_asset_location" class="block text-xs font-bold text-slate-700 uppercase mb-1">Lokasi Penempatan</label>
+                        <input type="text" id="edit_asset_location" name="location" x-model="selectedAsset.location" placeholder="Ruang Poliklinik / Rak A..." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-rose-700 outline-none">
+                    </div>
+
+                    <div>
+                        <label for="edit_asset_status" class="block text-xs font-bold text-slate-700 uppercase mb-1">Status Kondisi</label>
+                        <select id="edit_asset_status" name="status" x-model="selectedAsset.status" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-rose-700 outline-none font-semibold">
+                            <option value="tersedia">Tersedia (Kondisi Baik)</option>
+                            <option value="digunakan">Sedang Digunakan</option>
+                            <option value="rusak">Rusak (Perlu Perbaikan)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label for="edit_asset_description" class="block text-xs font-bold text-slate-700 uppercase mb-1">Deskripsi / Keterangan Kondisi</label>
+                    <textarea id="edit_asset_description" name="description" x-model="selectedAsset.description" rows="3" placeholder="Keterangan spesifikasi / kondisi barang..." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-rose-700 outline-none"></textarea>
+                </div>
+
+                <!-- Actions -->
+                <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-2.5">
+                    <button type="button" @click="editModalOpen = false" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-semibold cursor-pointer">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#7f1d2d] hover:bg-[#991b1b] text-white font-bold text-xs shadow-md cursor-pointer">
+                        Simpan Perubahan
                     </button>
                 </div>
             </form>

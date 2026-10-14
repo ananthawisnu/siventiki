@@ -107,6 +107,7 @@ class AssetController extends Controller
             'acquisition_year' => ['required', 'integer', 'min:2000', 'max:'.(date('Y') + 1)],
             'funding_source' => ['required', 'string', 'max:255'],
             'location' => ['nullable', 'string', 'max:255'],
+            'status' => ['nullable', Rule::in(['tersedia', 'digunakan', 'rusak'])],
             'description' => ['nullable', 'string', 'max:1000'],
         ]);
 
